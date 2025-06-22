@@ -1,0 +1,63 @@
+#!/bin/bash
+
+# Script per mostrare l'aiuto e gli script disponibili
+echo "📚 Script di Supporto Docker - Guida Rapida"
+echo "=========================================="
+echo ""
+
+echo "🚀 GESTIONE SERVIZI:"
+echo "-------------------"
+echo "  start.sh     - Avvia tutti i servizi Docker (app, database, apache)"
+echo "  stop.sh      - Ferma tutti i servizi Docker"
+echo "  restart.sh   - Riavvia tutti i servizi Docker"
+echo "  status.sh    - Mostra lo stato di container, network e volumi"
+echo ""
+
+echo "📋 MONITORAGGIO:"
+echo "---------------"
+echo "  logs.sh      - Visualizza i log di tutti i servizi in tempo reale"
+echo ""
+
+echo "⚙️  LARAVEL E COMPOSER:"
+echo "---------------------"
+echo "  artisan.sh   - Esegue comandi Artisan Laravel"
+echo "  composer.sh  - Esegue comandi Composer"
+echo ""
+
+echo "🔧 UTILITY:"
+echo "----------"
+echo "  shell.sh     - Accede alla shell del container app"
+echo "  db.sh        - Accede al database"
+echo "  help.sh      - Mostra questa guida (questo script)"
+echo ""
+
+echo "📖 ESEMPI DI UTILIZZO:"
+echo "--------------------"
+echo "  ./scripts/start.sh                    # Avvia i servizi"
+echo "  ./scripts/artisan.sh migrate          # Esegue le migrazioni"
+echo "  ./scripts/composer.sh install         # Installa dipendenze"
+echo "  ./scripts/db.sh                       # Accede al database"
+echo "  ./scripts/logs.sh                     # Visualizza i log"
+echo ""
+
+echo "🌐 INFORMAZIONI UTILI:"
+echo "-------------------"
+echo "  Web server:     http://localhost:8000"
+echo "  Database PostgreSQL: localhost:5432"
+echo "  Credenziali DB: laravel/password"
+echo "  Database:       laravel"
+echo ""
+
+echo "📝 NOTE:"
+echo "------"
+echo "  - Tutti gli script devono essere eseguiti dalla directory principale del progetto"
+echo "  - Assicurati che Docker sia in esecuzione prima di usare gli script"
+echo "  - Gli script verificano automaticamente la presenza di docker-compose.yml"
+echo "  - Per maggiori dettagli, consulta: scripts/README.md"
+echo ""
+
+echo "❓ BISOGNO DI AIUTO?"
+echo "------------------"
+echo "  Per problemi con Docker: ./scripts/status.sh"
+echo "  Per vedere i log:        ./scripts/logs.sh"
+echo "  Per accesso shell:       ./scripts/shell.sh"
