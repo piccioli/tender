@@ -105,4 +105,14 @@ class User extends Resource
     {
         return [];
     }
+
+    /**
+     * Get the group that the resource belongs to.
+     *
+     * @return string
+     */
+    public static function group()
+    {
+        return 'Admin';
+    }
 }

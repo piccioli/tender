@@ -3,8 +3,11 @@
 namespace App\Providers;
 
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Laravel\Fortify\Features;
+use Laravel\Nova\Menu\MenuItem;
+use Laravel\Nova\Menu\MenuSection;
 use Laravel\Nova\Nova;
 use Laravel\Nova\NovaApplicationServiceProvider;
 
@@ -17,7 +20,17 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
     {
         parent::boot();
 
-        //
+        Nova::mainMenu(function (Request $request) {
+            return [
+                MenuSection::make('Tender', [
+                    MenuItem::resource(\App\Nova\Tender::class),
+                ])->icon('document-text')->collapsable(),
+
+                MenuSection::make('Admin', [
+                    MenuItem::resource(\App\Nova\User::class),
+                ])->icon('shield-check')->collapsable(),
+            ];
+        });
     }
 
     /**
@@ -28,8 +41,6 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
         Nova::fortify()
             ->features([
                 Features::updatePasswords(),
-                // Features::emailVerification(),
-                // Features::twoFactorAuthentication(['confirm' => true, 'confirmPassword' => true]),
             ])
             ->register();
     }
@@ -88,7 +99,5 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
     public function register(): void
     {
         parent::register();
-
-        //
     }
 }
