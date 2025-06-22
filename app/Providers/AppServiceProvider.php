@@ -3,6 +3,9 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Event;
+use Laravel\Nova\Events\StartedImpersonating;
+use Laravel\Nova\Events\StoppedImpersonating;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +22,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Event::listen(StartedImpersonating::class, function ($event) {
+            logger("User {$event->impersonator->name} started impersonating {$event->impersonated->name}");
+        });
+
+        Event::listen(StoppedImpersonating::class, function ($event) {
+            logger("User {$event->impersonator->name} stopped impersonating {$event->impersonated->name}");
+        });
     }
 }

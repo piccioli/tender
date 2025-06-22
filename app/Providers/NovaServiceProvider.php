@@ -65,9 +65,18 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
     protected function gate(): void
     {
         Gate::define('viewNova', function (User $user) {
-            return in_array($user->email, [
-                //
-            ]);
+            // Allow all users to access Nova for development
+            // In production, you might want to restrict this to specific roles or emails
+            return true;
+            
+            // Alternative: Allow only users with specific roles
+            // return $user->hasRole(['admin', 'manager']);
+            
+            // Alternative: Allow only specific email addresses
+            // return in_array($user->email, [
+            //     'admin@example.com',
+            //     'manager@example.com',
+            // ]);
         });
     }
 

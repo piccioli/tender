@@ -107,6 +107,18 @@ class User extends Resource
     }
 
     /**
+     * Get the inline actions available for the resource.
+     *
+     * @return array<int, \Laravel\Nova\Actions\Action>
+     */
+    public function inlineActions(NovaRequest $request): array
+    {
+        return [
+            \Laravel\Nova\Actions\Impersonate::make(),
+        ];
+    }
+
+    /**
      * Get the group that the resource belongs to.
      *
      * @return string
