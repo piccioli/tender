@@ -4,11 +4,13 @@ namespace App\Nova;
 
 use Illuminate\Http\Request;
 use Laravel\Nova\Auth\PasswordValidationRules;
+use Laravel\Nova\Fields\Badge;
 use Laravel\Nova\Fields\Gravatar;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Password;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\NovaRequest;
+use Laravel\Nova\Fields\BelongsToMany;
 
 class User extends Resource
 {
@@ -59,6 +61,13 @@ class User extends Resource
                 ->creationRules('unique:users,email')
                 ->updateRules('unique:users,email,{{resourceId}}'),
 
+            Text::make('Roles', function () {
+                return $this->roles->pluck('name')->implode(', ');
+            })->onlyOnIndex(),
+
+            BelongsToMany::make('Roles')
+                ->hideFromIndex(),
+
             Password::make('Password')
                 ->onlyOnForms()
                 ->creationRules($this->passwordRules())
@@ -83,7 +92,9 @@ class User extends Resource
      */
     public function filters(NovaRequest $request): array
     {
-        return [];
+        return [
+            new \App\Nova\Filters\RoleFilter,
+        ];
     }
 
     /**
