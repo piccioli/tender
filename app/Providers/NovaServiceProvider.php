@@ -28,6 +28,8 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
 
                 MenuSection::make('Admin', [
                     MenuItem::resource(\App\Nova\User::class),
+                    MenuItem::resource(\App\Nova\Role::class),
+                    MenuItem::resource(\App\Nova\Permission::class),
                 ])->icon('shield-check')->collapsable(),
             ];
         });

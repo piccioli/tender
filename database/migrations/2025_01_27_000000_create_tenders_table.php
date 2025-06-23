@@ -13,29 +13,44 @@ return new class extends Migration
     {
         Schema::create('tenders', function (Blueprint $table) {
             $table->id();
-            $table->string('title'); // Titolo del bando
-            $table->text('description')->nullable(); // Descrizione
-            $table->string('reference_number')->unique(); // Numero di riferimento
-            $table->string('contracting_authority'); // Stazione appaltante
-            $table->decimal('estimated_value', 15, 2)->nullable(); // Valore stimato
-            $table->string('currency', 3)->default('EUR'); // Valuta
-            $table->date('publication_date'); // Data di pubblicazione
-            $table->date('submission_deadline'); // Scadenza presentazione
-            $table->date('opening_date')->nullable(); // Data apertura buste
-            $table->string('procedure_type'); // Tipo di procedura
-            $table->string('contract_type'); // Tipo di contratto
-            $table->string('cpv_codes')->nullable(); // Codici CPV
-            $table->string('place_of_execution')->nullable(); // Luogo di esecuzione
-            $table->string('duration_months')->nullable(); // Durata in mesi
-            $table->string('status')->default('active'); // Stato del bando
-            $table->text('notes')->nullable(); // Note aggiuntive
-            $table->string('document_url')->nullable(); // URL documento
+
+            // General tender data
+            $table->string('name');
+            $table->string('program')->nullable();
+            $table->string('implementation_place')->nullable();
+            $table->string('funding_agency')->nullable();
+            $table->text('website')->nullable();
+            $table->text('topic')->nullable();
+            $table->date('publication_date')->nullable();
+            $table->date('deadline')->nullable();
+            $table->float('beneficiary_investment', 8, 2)->nullable();
+            $table->integer('projects_submittable')->nullable();
+            $table->float('ms_budget_estimate', 12, 2)->nullable();
+            $table->string('funding_type')->nullable();
+            $table->text('ms_actions_hypothesis')->nullable();
+            $table->string('project_duration')->nullable();
+            $table->date('activity_start')->nullable();
+            $table->date('activity_end')->nullable();
+            $table->string('funding_cycle')->nullable();
+            $table->date('last_publication_date')->nullable();
+
+            // Tender type (from sheet name)
+            $table->enum('tender_type', [
+                'Regionale - Locale',
+                'Nazionale',
+                'Europeo',
+                'Cooperazione',
+                'Bandi per MS'
+            ]);
+
+            // Tender status
+            $table->enum('status', ['draft', 'submitted', 'approved', 'rejected'])->default('draft');
+
+            // User relations
+            $table->foreignId('user_creator_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('user_editor_id')->nullable()->constrained('users')->nullOnDelete();
+
             $table->timestamps();
-            
-            // Indici per migliorare le performance
-            $table->index(['status', 'publication_date']);
-            $table->index(['contracting_authority']);
-            $table->index(['procedure_type']);
         });
     }
 

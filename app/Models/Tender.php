@@ -10,43 +10,68 @@ class Tender extends Model
     use HasFactory;
 
     protected $fillable = [
-        'title',
-        'description',
-        'reference_number',
-        'contracting_authority',
-        'estimated_value',
-        'currency',
+        'name',
+        'program',
+        'implementation_place',
+        'funding_agency',
+        'website',
+        'topic',
         'publication_date',
-        'submission_deadline',
-        'opening_date',
-        'procedure_type',
-        'contract_type',
-        'cpv_codes',
-        'place_of_execution',
-        'duration_months',
+        'deadline',
+        'beneficiary_investment',
+        'projects_submittable',
+        'ms_budget_estimate',
+        'funding_type',
+        'ms_actions_hypothesis',
+        'project_duration',
+        'activity_start',
+        'activity_end',
+        'funding_cycle',
+        'last_publication_date',
+        'tender_type',
         'status',
-        'notes',
-        'document_url',
+        'user_creator_id',
+        'user_editor_id',
     ];
 
     protected $casts = [
         'publication_date' => 'date',
-        'submission_deadline' => 'date',
-        'opening_date' => 'date',
-        'estimated_value' => 'decimal:2',
+        'deadline' => 'date',
+        'last_publication_date' => 'date',
+        'beneficiary_investment' => 'float',
+        'ms_budget_estimate' => 'float',
+        'activity_start' => 'date',
+        'activity_end' => 'date',
     ];
 
-    /**
-     * Get the status options for the tender
-     */
+    public function userCreator()
+    {
+        return $this->belongsTo(User::class, 'user_creator_id');
+    }
+
+    public function userEditor()
+    {
+        return $this->belongsTo(User::class, 'user_editor_id');
+    }
+
+    public static function getTenderTypeOptions(): array
+    {
+        return [
+            'Regionale - Locale' => 'Regionale - Locale',
+            'Nazionale' => 'Nazionale',
+            'Europeo' => 'Europeo',
+            'Cooperazione' => 'Cooperazione',
+            'Bandi per MS' => 'Bandi per MS',
+        ];
+    }
+
     public static function getStatusOptions(): array
     {
         return [
-            'active' => 'Attivo',
-            'closed' => 'Chiuso',
-            'awarded' => 'Aggiudicato',
-            'cancelled' => 'Annullato',
             'draft' => 'Bozza',
+            'submitted' => 'Inviato',
+            'approved' => 'Approvato',
+            'rejected' => 'Respinto',
         ];
     }
 
@@ -113,5 +138,14 @@ class Tender extends Model
         }
         
         return number_format($this->estimated_value, 2, ',', '.') . ' ' . $this->currency;
+    }
+
+    protected static function booted()
+    {
+        static::creating(function ($tender) {
+            if (auth()->check() && empty($tender->user_creator_id)) {
+                $tender->user_creator_id = auth()->id();
+            }
+        });
     }
 } 

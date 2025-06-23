@@ -12,6 +12,7 @@ use Laravel\Nova\Fields\Date;
 use Laravel\Nova\Fields\URL;
 use Laravel\Nova\Fields\Badge;
 use Laravel\Nova\Fields\Heading;
+use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Resource;
 use Laravel\Nova\Panel;
@@ -30,7 +31,7 @@ class Tender extends Resource
      *
      * @var string
      */
-    public static $title = 'title';
+    public static $title = 'name';
 
     /**
      * The columns that should be searched.
@@ -38,7 +39,7 @@ class Tender extends Resource
      * @var array
      */
     public static $search = [
-        'id', 'title', 'reference_number', 'contracting_authority'
+        'id', 'name', 'manager', 'program', 'funding_agency'
     ];
 
     /**
@@ -50,108 +51,77 @@ class Tender extends Resource
     public function fields(NovaRequest $request)
     {
         return [
-            ID::make()->sortable(),
+            ID::make()->sortable()->onlyOnIndex(),
 
-            new Panel('Informazioni Generali', [
-                Text::make('Titolo', 'title')
-                    ->sortable()
-                    ->rules('required', 'max:255'),
-
-                Textarea::make('Descrizione', 'description')
-                    ->hideFromIndex()
-                    ->nullable(),
-
-                Text::make('Numero di Riferimento', 'reference_number')
-                    ->sortable()
-                    ->rules('required', 'unique:tenders,reference_number,{{resourceId}}'),
-
-                Text::make('Stazione Appaltante', 'contracting_authority')
-                    ->sortable()
-                    ->rules('required', 'max:255'),
-            ]),
-
-            new Panel('Valore e Date', [
-                Number::make('Valore Stimato', 'estimated_value')
-                    ->step(0.01)
-                    ->nullable()
-                    ->displayUsing(function ($value) {
-                        return $value ? number_format($value, 2, ',', '.') . ' €' : 'Non specificato';
-                    }),
-
-                Select::make('Valuta', 'currency')
-                    ->options([
-                        'EUR' => 'Euro (€)',
-                        'USD' => 'Dollaro ($)',
-                        'GBP' => 'Sterlina (£)',
-                    ])
-                    ->default('EUR')
-                    ->rules('required'),
-
-                Date::make('Data di Pubblicazione', 'publication_date')
-                    ->sortable()
-                    ->rules('required', 'date'),
-
-                Date::make('Scadenza Presentazione', 'submission_deadline')
-                    ->sortable()
-                    ->rules('required', 'date', 'after:publication_date'),
-
-                Date::make('Data Apertura Buste', 'opening_date')
-                    ->nullable()
-                    ->rules('date', 'after:submission_deadline'),
-            ]),
-
-            new Panel('Dettagli Procedura', [
-                Select::make('Tipo di Procedura', 'procedure_type')
-                    ->options(\App\Models\Tender::getProcedureTypeOptions())
-                    ->sortable()
-                    ->rules('required'),
-
-                Select::make('Tipo di Contratto', 'contract_type')
-                    ->options(\App\Models\Tender::getContractTypeOptions())
-                    ->sortable()
-                    ->rules('required'),
-
-                Text::make('Codici CPV', 'cpv_codes')
-                    ->nullable()
-                    ->help('Separare i codici con virgola'),
-
-                Text::make('Luogo di Esecuzione', 'place_of_execution')
-                    ->nullable(),
-
-                Text::make('Durata (Mesi)', 'duration_months')
-                    ->nullable(),
-            ]),
-
-            new Panel('Stato e Note', [
-                Select::make('Stato', 'status')
-                    ->options(\App\Models\Tender::getStatusOptions())
-                    ->sortable()
-                    ->default('active')
-                    ->rules('required'),
-
-                Textarea::make('Note', 'notes')
-                    ->hideFromIndex()
-                    ->nullable(),
-
-                URL::make('URL Documento', 'document_url')
-                    ->nullable()
-                    ->hideFromIndex(),
-            ]),
-
-            // Campi calcolati per l'index
             Badge::make('Stato', 'status')
                 ->map([
-                    'active' => 'success',
-                    'closed' => 'warning',
-                    'awarded' => 'info',
-                    'cancelled' => 'danger',
-                    'draft' => 'default',
+                    'draft' => 'info',
+                    'submitted' => 'warning',
+                    'approved' => 'success',
+                    'rejected' => 'danger',
                 ])
                 ->onlyOnIndex(),
 
-            Text::make('Valore Formattato', function () {
-                return $this->formatted_estimated_value;
-            })->onlyOnIndex(),
+            Select::make('Tipo Bando', 'tender_type')
+                ->options(\App\Models\Tender::getTenderTypeOptions())
+                ->onlyOnIndex(),
+
+            Text::make('Nome Bando', 'name')
+                ->onlyOnIndex(),
+
+            Text::make('Programma', 'program')
+                ->onlyOnIndex(),
+
+            Date::make('Scadenza', 'deadline')
+                ->onlyOnIndex(),
+
+            Number::make('Investimento Beneficiario', 'beneficiary_investment')
+                ->step(0.01)
+                ->onlyOnIndex()
+                ->displayUsing(fn($value) => is_null($value) ? null : number_format($value, 2, ',', '.') . ' €'),
+
+            Number::make('Stima Budget MS', 'ms_budget_estimate')
+                ->step(0.01)
+                ->onlyOnIndex()
+                ->displayUsing(fn($value) => is_null($value) ? null : number_format($value, 2, ',', '.') . ' €'),
+
+            BelongsTo::make('Creatore', 'userCreator', User::class)
+                ->onlyOnIndex()
+                ->onlyOnDetail()
+                ->readonly()
+                ->rules('required'),
+
+
+
+            // Tutti gli altri campi solo su form/detail
+            ID::make()->sortable()->hideFromIndex(),
+            Text::make('Nome Bando', 'name')->sortable()->rules('required', 'max:255')->hideFromIndex(),
+            Select::make('Tipo Bando', 'tender_type')
+                ->options(\App\Models\Tender::getTenderTypeOptions())
+                ->rules('required')
+                ->hideFromIndex(),
+            Select::make('Stato', 'status')
+                ->options(\App\Models\Tender::getStatusOptions())
+                ->rules('required')
+                ->hideFromIndex(),
+            Text::make('Programma', 'program')->nullable()->hideFromIndex(),
+            Text::make('Luogo Implementazione', 'implementation_place')->nullable()->hideFromIndex(),
+            Text::make('Ente Finanziatore', 'funding_agency')->nullable()->hideFromIndex(),
+            Textarea::make('Sito Web Bando', 'website')->nullable()->hideFromIndex(),
+            Textarea::make('Tematica', 'topic')->nullable()->hideFromIndex(),
+            Date::make('Data Pubblicazione', 'publication_date')->nullable()->hideFromIndex(),
+            Number::make('Numero Progetti Presentabili', 'projects_submittable')->nullable()->hideFromIndex(),
+            Text::make('Tipologia Finanziamento', 'funding_type')->nullable()->hideFromIndex(),
+            Textarea::make('Ipotesi Azioni MS', 'ms_actions_hypothesis')->nullable()->hideFromIndex(),
+            Text::make('Durata Progetto', 'project_duration')->nullable()->hideFromIndex(),
+            Date::make('Inizio Attività', 'activity_start')->nullable()->hideFromIndex(),
+            Date::make('Fine Attività', 'activity_end')->nullable()->hideFromIndex(),
+            Text::make('Ciclicità Finanziamento', 'funding_cycle')->nullable()->hideFromIndex(),
+            Date::make('Data Ultima Pubblicazione', 'last_publication_date')->nullable()->hideFromIndex(),
+            Date::make('Scadenza', 'deadline')->hideFromIndex(),
+            Number::make('Investimento Beneficiario', 'beneficiary_investment')->step(0.01)->hideFromIndex(),
+            Number::make('Stima Budget MS', 'ms_budget_estimate')->step(0.01)->hideFromIndex(),
+            BelongsTo::make('Redattore', 'userEditor', User::class)->nullable()->hideFromIndex(),
         ];
     }
 
@@ -243,7 +213,7 @@ class Tender extends Resource
      */
     public static function authorizedToCreate(Request $request)
     {
-        return $request->user() && $request->user()->can('create', static::$model);
+        return $request->user() !== null;
     }
 
     /**
