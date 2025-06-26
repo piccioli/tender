@@ -168,6 +168,8 @@ class Tender extends Resource
             new \App\Nova\Filters\TenderStatusFilter,
             new \App\Nova\Filters\TenderProcedureTypeFilter,
             new \App\Nova\Filters\TenderContractTypeFilter,
+            new \App\Nova\Filters\CreatorFilter,
+            new \App\Nova\Filters\EditorFilter,
         ];
     }
 
