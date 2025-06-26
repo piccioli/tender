@@ -21,17 +21,22 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
         parent::boot();
 
         Nova::mainMenu(function (Request $request) {
-            return [
+            $menu = [
                 MenuSection::make('Tender', [
                     MenuItem::resource(\App\Nova\Tender::class),
                 ])->icon('document-text')->collapsable(),
+            ];
 
-                MenuSection::make('Admin', [
+            // Aggiungi la sezione Admin solo se l'utente ha il ruolo admin
+            if ($request->user() && $request->user()->hasRole('admin')) {
+                $menu[] = MenuSection::make('Admin', [
                     MenuItem::resource(\App\Nova\User::class),
                     MenuItem::resource(\App\Nova\Role::class),
                     MenuItem::resource(\App\Nova\Permission::class),
-                ])->icon('shield-check')->collapsable(),
-            ];
+                ])->icon('shield-check')->collapsable();
+            }
+
+            return $menu;
         });
     }
 
@@ -67,18 +72,8 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
     protected function gate(): void
     {
         Gate::define('viewNova', function (User $user) {
-            // Allow all users to access Nova for development
-            // In production, you might want to restrict this to specific roles or emails
-            return true;
-            
-            // Alternative: Allow only users with specific roles
-            // return $user->hasRole(['admin', 'manager']);
-            
-            // Alternative: Allow only specific email addresses
-            // return in_array($user->email, [
-            //     'admin@example.com',
-            //     'manager@example.com',
-            // ]);
+            // Allow only users with admin role to access Nova
+            return $user->hasRole('admin');
         });
     }
 
