@@ -73,7 +73,27 @@ class Tender extends Resource
                 ->onlyOnIndex(),
 
             Date::make('Scadenza', 'deadline')
-                ->onlyOnIndex(),
+                ->onlyOnIndex()
+                ->sortable(),
+
+            Text::make('Giorni alla Scadenza', function () {
+                if (!$this->deadline) {
+                    return '-';
+                }
+                $today = now()->startOfDay();
+                $deadline = \Carbon\Carbon::parse($this->deadline)->startOfDay();
+                $daysDiff = $today->diffInDays($deadline, false);
+            
+                if ($daysDiff < 0) {
+                    return '<span style="color: #fff; background: #e3342f; border-radius: 0.25rem; padding: 0.2em 0.6em; font-size: 0.9em;">Scaduto</span>';
+                } elseif ($daysDiff == 0) {
+                    return '<span style="color: #fff; background: #f59e42; border-radius: 0.25rem; padding: 0.2em 0.6em; font-size: 0.9em;">Scade oggi</span>';
+                } elseif ($daysDiff <= 7) {
+                    return '<span style="color: #fff; background: #f59e42; border-radius: 0.25rem; padding: 0.2em 0.6em; font-size: 0.9em;">' . $daysDiff . ' giorni</span>';
+                } else {
+                    return '<span style="color: #fff; background: #38c172; border-radius: 0.25rem; padding: 0.2em 0.6em; font-size: 0.9em;">' . $daysDiff . ' giorni</span>';
+                }
+            })->onlyOnIndex()->asHtml(),
 
             Number::make('Investimento Beneficiario', 'beneficiary_investment')
                 ->step(0.01)
@@ -86,12 +106,13 @@ class Tender extends Resource
                 ->displayUsing(fn($value) => is_null($value) ? null : number_format($value, 2, ',', '.') . ' €'),
 
             BelongsTo::make('Creatore', 'userCreator', User::class)
-                ->onlyOnIndex()
-                ->onlyOnDetail()
                 ->readonly()
+                ->hideWhenCreating()
+                ->hideWhenUpdating()
                 ->rules('required'),
 
-
+            BelongsTo::make('Redattore', 'userEditor', User::class)
+                ->nullable(),
 
             // Tutti gli altri campi solo su form/detail
             ID::make()->sortable()->hideFromIndex(),
@@ -121,7 +142,6 @@ class Tender extends Resource
             Date::make('Scadenza', 'deadline')->hideFromIndex(),
             Number::make('Investimento Beneficiario', 'beneficiary_investment')->step(0.01)->hideFromIndex(),
             Number::make('Stima Budget MS', 'ms_budget_estimate')->step(0.01)->hideFromIndex(),
-            BelongsTo::make('Redattore', 'userEditor', User::class)->nullable()->hideFromIndex(),
         ];
     }
 
