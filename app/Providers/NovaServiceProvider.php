@@ -11,9 +11,31 @@ use Laravel\Nova\Menu\MenuSection;
 use Laravel\Nova\Nova;
 use Laravel\Nova\NovaApplicationServiceProvider;
 use Tender\WelcomePage\WelcomePage;
+use Illuminate\Support\Facades\Blade;
+
 
 class NovaServiceProvider extends NovaApplicationServiceProvider
 {
+    /**
+     * Get Nova version from composer.lock
+     */
+    private function getNovaVersion(): string
+    {
+        try {
+            $composerLockPath = base_path('composer.lock');
+            if (file_exists($composerLockPath)) {
+                $composerLock = json_decode(file_get_contents($composerLockPath), true);
+                $novaPackage = collect($composerLock['packages'])->firstWhere('name', 'laravel/nova');
+                return $novaPackage['version'] ?? 'Unknown';
+            }
+        } catch (Exception $e) {
+            // Log error if needed
+            // \Log::warning('Could not read Nova version from composer.lock: ' . $e->getMessage());
+        }
+        
+        return 'Unknown';
+    }
+
     /**
      * Bootstrap any application services.
      */
@@ -43,6 +65,36 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
             }
 
             return $menu;
+        });
+
+        Nova::footer(function (Request $request) {
+            $novaVersion = $this->getNovaVersion();
+
+            return Blade::render('
+                <div class="text-center py-4 px-6 bg-gray-100 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center justify-center mb-2">
+                        <img src="/img/logo-montagna-servizi.png" alt="Montagna Servizi" class="h-6 w-auto mr-3">
+                        <span class="font-semibold text-lg text-gray-800 dark:text-gray-200">Montagna Servizi SCPA</span>
+                    </div>
+                    
+                    <div class="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                        © 2025 Montagna Servizi SCPA | Versione App: {{ config("app.version", "???") }}
+                    </div>
+                    
+                    <div class="text-xs text-gray-500 dark:text-gray-500 flex flex-wrap justify-center gap-4">
+                        <span>Laravel {{ app()->version() }}</span>
+                        <span>PHP {{ phpversion() }}</span>
+                        <span>Nova {{ $novaVersion }}</span>
+                        <span>Ambiente: {{ config("app.env") }}</span>
+                    </div>
+                    
+                    <div class="mt-3 text-xs">
+                        <a href="#" class="text-blue-600 dark:text-blue-400 hover:underline mx-2">Privacy Policy</a>
+                        <a href="#" class="text-blue-600 dark:text-blue-400 hover:underline mx-2">Termini di Servizio</a>
+                        <a href="#" class="text-blue-600 dark:text-blue-400 hover:underline mx-4">Supporto</a>
+                    </div>
+                </div>
+            ', ['novaVersion' => $novaVersion]);
         });
     }
 
