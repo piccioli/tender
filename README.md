@@ -1,61 +1,224 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🏔️ Gestionale Montagna Servizi SCPA
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+[![Release](https://img.shields.io/badge/release-v1.0.0-blue.svg)](https://github.com/piccioli/tender/releases/tag/v1.0.0)
+[![Laravel](https://img.shields.io/badge/Laravel-10.x-red.svg)](https://laravel.com)
+[![Nova](https://img.shields.io/badge/Nova-4.x-purple.svg)](https://nova.laravel.com)
+[![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://docker.com)
 
-## About Laravel
+Sistema di gestione tender completo per **Montagna Servizi SCPA**, sviluppato con Laravel Nova e ottimizzato per ambienti Docker.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🚀 Caratteristiche Principali
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- **📊 Dashboard Nova personalizzata** con branding Montagna Servizi
+- **📋 Gestione completa tender** con filtri avanzati e ricerca
+- **🔐 Sistema di autenticazione** con autorizzazione basata su ruoli
+- **📤 Esportazione dati** con azioni personalizzate
+- **🔄 Script di deployment** e rollback per produzione
+- **📱 Interfaccia responsive** ottimizzata per tutti i dispositivi
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 🛠️ Tecnologie Utilizzate
 
-## Learning Laravel
+- **Backend:** Laravel 10.x
+- **Admin Panel:** Laravel Nova 4.x
+- **Database:** MySQL/PostgreSQL
+- **Container:** Docker & Docker Compose
+- **Frontend:** Vue.js, Tailwind CSS
+- **Autenticazione:** Spatie Permission
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## 📦 Installazione Rapida
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### Prerequisiti
+- Docker e Docker Compose
+- Git
+- PHP 8.0+ (per sviluppo locale)
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Setup
+```bash
+# 1. Clona il repository
+git clone https://github.com/piccioli/tender.git
+cd tender
 
-## Laravel Sponsors
+# 2. Avvia i container Docker
+docker-compose up -d
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+# 3. Installa le dipendenze
+docker-compose exec app composer install
 
-### Premium Partners
+# 4. Configura l'ambiente
+cp .env.example .env
+docker-compose exec app php artisan key:generate
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+# 5. Esegui le migrazioni e i seeder
+docker-compose exec app php artisan migrate --seed
 
-## Contributing
+# 6. Ottimizza per produzione
+docker-compose exec app php artisan optimize
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Accesso
+- **URL:** http://localhost:8000
+- **Nova Admin:** http://localhost:8000/nova
+- **Credenziali default:** Controlla il seeder per le credenziali
 
-## Code of Conduct
+## 🔧 Configurazione
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Variabili d'Ambiente Importanti
+```env
+APP_NAME="Gestionale Montagna Servizi SCPA"
+APP_VERSION="v1.0.0"
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://your-domain.com
 
-## Security Vulnerabilities
+DB_CONNECTION=mysql
+DB_HOST=db
+DB_PORT=3306
+DB_DATABASE=tender
+DB_USERNAME=tender_user
+DB_PASSWORD=secure_password
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### Personalizzazione Versione
+Per aggiornare la versione visualizzata nel footer:
+```env
+APP_VERSION="v1.1.0"
+```
 
-## License
+## 📋 Script di Utilità
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Il progetto include script per semplificare le operazioni:
+
+```bash
+# Deployment in produzione
+./scripts/deploy.sh
+
+# Rollback a versione precedente
+./scripts/rollback.sh <commit-hash>
+
+# Backup database
+./scripts/backup_db.sh
+
+# Restore database
+./scripts/restore_db.sh <backup-file>
+
+# Gestione container
+./scripts/start.sh    # Avvia container
+./scripts/stop.sh     # Ferma container
+./scripts/restart.sh  # Riavvia container
+./scripts/status.sh   # Stato container
+
+# Pulizia e ottimizzazione
+./scripts/clear.sh    # Pulisce cache
+./scripts/logs.sh     # Visualizza log
+```
+
+## 🏗️ Struttura del Progetto
+
+```
+tender/
+├── app/
+│   ├── Nova/           # Risorse Nova personalizzate
+│   ├── Models/         # Modelli Eloquent
+│   ├── Policies/       # Politiche di autorizzazione
+│   └── Http/           # Controller e middleware
+├── database/
+│   ├── migrations/     # Migrazioni database
+│   └── seeders/        # Seeder per dati iniziali
+├── nova-components/    # Componenti Nova custom
+├── scripts/           # Script di utilità
+├── docker/            # Configurazioni Docker
+└── resources/         # Assets frontend
+```
+
+## 🔐 Sicurezza
+
+- **Autenticazione a due fattori** (2FA)
+- **Autorizzazione basata su ruoli** con Spatie Permission
+- **Politiche di accesso** per ogni risorsa
+- **Validazione input** robusta
+- **Protezione CSRF** attiva
+
+## 📊 Funzionalità Tender
+
+### Filtri Disponibili
+- **Creatore:** Filtra per utente che ha creato il tender
+- **Editore:** Filtra per utente che ha modificato il tender
+- **Ruolo:** Filtra per ruolo dell'utente
+- **Tipo Contratto:** Filtra per tipo di contratto
+- **Tipo Procedura:** Filtra per tipo di procedura
+- **Stato:** Filtra per stato del tender
+
+### Azioni
+- **Esportazione dati** in formato CSV/Excel
+- **Bulk actions** per operazioni multiple
+- **Azioni personalizzate** per workflow specifici
+
+## 🚀 Deployment
+
+### Produzione con Docker
+```bash
+# 1. Clona il repository sul server
+git clone https://github.com/piccioli/tender.git
+cd tender
+
+# 2. Configura l'ambiente di produzione
+cp .env.example .env
+# Modifica .env con le configurazioni di produzione
+
+# 3. Deploy automatico
+./scripts/deploy.sh
+```
+
+### Rollback
+```bash
+# In caso di problemi, torna alla versione precedente
+./scripts/rollback.sh <commit-hash>
+```
+
+## 📈 Monitoraggio
+
+### Log
+```bash
+# Visualizza log dell'applicazione
+./scripts/logs.sh
+
+# Log specifici
+docker-compose logs -f app
+docker-compose logs -f db
+```
+
+### Backup
+```bash
+# Backup automatico del database
+./scripts/backup_db.sh
+
+# Backup manuale
+docker-compose exec db mysqldump -u root -p tender > backup.sql
+```
+
+## 🤝 Contribuire
+
+1. Fork del progetto
+2. Crea un branch per la feature (`git checkout -b feature/AmazingFeature`)
+3. Commit delle modifiche (`git commit -m 'Add some AmazingFeature'`)
+4. Push al branch (`git push origin feature/AmazingFeature`)
+5. Apri una Pull Request
+
+## 📝 Changelog
+
+Vedi [RELEASE_NOTES.md](RELEASE_NOTES.md) per il changelog completo.
+
+## 📄 Licenza
+
+Questo progetto è sviluppato per **Montagna Servizi SCPA** e non è open source.
+
+## 📞 Supporto
+
+- **Sviluppatore:** Alessio Piccioli
+- **Email:** piccioli@netseven.it
+- **Azienda:** Montagna Servizi SCPA
+
+---
+
+**Versione:** v1.0.0  
+**Ultimo aggiornamento:** 29 Giugno 2025
