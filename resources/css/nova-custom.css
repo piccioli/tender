@@ -1,0 +1,24 @@
+/* Custom Nova Logo Styling */
+.nova-brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nova-brand img,
+.nova-brand svg {
+    max-height: 40px;
+    width: auto;
+    margin-right: 10px;
+}
+
+/* Alternative: if you want to adjust the logo size */
+.nova-brand svg {
+    max-height: 35px;
+    width: auto;
+}
+
+/* If you want to center the logo better */
+.nova-brand {
+    padding: 8px 0;
+} 

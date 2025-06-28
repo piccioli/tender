@@ -5,3 +5,7 @@ composer.phar
 .bash_history
 # Backup database
 /db_backups/
+
+# macOS system files
+.DS_Store
+**/.DS_Store
