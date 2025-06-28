@@ -10,6 +10,7 @@ use Laravel\Nova\Menu\MenuItem;
 use Laravel\Nova\Menu\MenuSection;
 use Laravel\Nova\Nova;
 use Laravel\Nova\NovaApplicationServiceProvider;
+use Tender\WelcomePage\WelcomePage;
 
 class NovaServiceProvider extends NovaApplicationServiceProvider
 {
@@ -23,7 +24,8 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
         Nova::mainMenu(function (Request $request) {
             $menu = [
                 MenuSection::make('Home', [
-                    MenuItem::dashboard(\App\Nova\Dashboards\Main::class),
+                    MenuItem::externalLink('Welcome','/nova/welcome-page'),
+                    MenuItem::dashboard(\App\Nova\Dashboards\Main::class)->name('Nova'),
                 ])->icon('home')->collapsable(),
                 
                 MenuSection::make('Bandi', [
@@ -100,7 +102,9 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
      */
     public function tools(): array
     {
-        return [];
+        return [
+            new WelcomePage,
+        ];
     }
 
     /**
@@ -109,5 +113,7 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
     public function register(): void
     {
         parent::register();
+
+        Nova::initialPath('/welcome-page');
     }
 }
