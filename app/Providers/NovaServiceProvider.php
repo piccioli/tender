@@ -22,8 +22,12 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
 
         Nova::mainMenu(function (Request $request) {
             $menu = [
-                MenuSection::make('Tender', [
-                    MenuItem::resource(\App\Nova\Tender::class),
+                MenuSection::make('Home', [
+                    MenuItem::dashboard(\App\Nova\Dashboards\Main::class),
+                ])->icon('home')->collapsable(),
+                
+                MenuSection::make('Bandi', [
+                    MenuItem::resource(\App\Nova\Tender::class)->name('Tutti'),
                 ])->icon('document-text')->collapsable(),
             ];
 
