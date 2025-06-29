@@ -8,7 +8,7 @@ DB_USER=${DB_USERNAME:-laravel}
 DB_PASS=${DB_PASSWORD:-password}
 
 # Configurazione per il download dalla produzione
-PROD_HOST=${PROD_HOST:-"http://46.62.139.115/"}
+PROD_HOST=${PROD_HOST:-"46.62.139.115"}
 PROD_USER=${PROD_USER:-"root"}
 PROD_BACKUP_PATH=${PROD_BACKUP_PATH:-"/root/tender/db_backups"}
 PROD_SSH_KEY=${PROD_SSH_KEY:-"~/.ssh/id_rsa"}
@@ -61,12 +61,12 @@ done
 download_production_backup() {
     echo "🔍 Connessione alla produzione per scaricare il backup..."
     
-    # Verifica che la chiave SSH esista
-    if [ ! -f "$PROD_SSH_KEY" ]; then
-        echo "❌ Chiave SSH non trovata: $PROD_SSH_KEY"
-        echo "   Imposta la variabile PROD_SSH_KEY o crea la chiave SSH"
-        exit 1
-    fi
+    # # Verifica che la chiave SSH esista
+    # if [ ! -f "$PROD_SSH_KEY" ]; then
+    #     echo "❌ Chiave SSH non trovata: $PROD_SSH_KEY"
+    #     echo "   Imposta la variabile PROD_SSH_KEY o crea la chiave SSH"
+    #     exit 1
+    # fi
     
     # Crea la directory dei backup se non esiste
     mkdir -p "$BACKUP_DIR"
@@ -90,28 +90,63 @@ download_production_backup() {
     
     echo "📦 Decompressione del backup..."
     
+    # Trova il nome del file SQL all'interno dell'archivio
+    SQL_IN_ARCHIVE=$(tar -tzf "$BACKUP_DIR/$PROD_BACKUP_FILE" | grep ".sql$" | head -n 1)
+    if [ -z "$SQL_IN_ARCHIVE" ]; then
+        echo "❌ Nessun file .sql trovato nell'archivio"
+        exit 1
+    fi
+    
     # Decomprimi il file .tgz
     tar -xzf "$BACKUP_DIR/$PROD_BACKUP_FILE" -C "$BACKUP_DIR"
     
-    # Rinomina il file decompresso
-    mv "$BACKUP_DIR/ms_last.sql" "$BACKUP_DIR/ms_last_prod.sql"
-    BACKUP_FILE="ms_last_prod.sql"
+    # Rinomina il file estratto in ms_last.sql
+    mv -f "$BACKUP_DIR/$SQL_IN_ARCHIVE" "$BACKUP_DIR/ms_last.sql"
+    BACKUP_FILE="ms_last.sql"
     
     echo "✅ Backup scaricato e decompresso: $BACKUP_FILE"
 }
 
 # Funzione per verificare il backup locale
 check_local_backup() {
+    # Controlla prima se esiste il file compresso
+    BACKUP_FILE_COMPRESSED="ms_last.sql.tgz"
+    BACKUP_PATH_COMPRESSED="$BACKUP_DIR/$BACKUP_FILE_COMPRESSED"
+    
+    # Controlla se esiste il file decompresso
     BACKUP_FILE="ms_last.sql"
     BACKUP_PATH="$BACKUP_DIR/$BACKUP_FILE"
     
-    if [ ! -f "$BACKUP_PATH" ]; then
-        echo "❌ File di backup non trovato: $BACKUP_PATH"
-        echo "   Assicurati che il file ms_last.sql sia presente nella directory $BACKUP_DIR"
+    if [ -f "$BACKUP_PATH_COMPRESSED" ]; then
+        echo "📦 Trovato backup compresso: $BACKUP_FILE_COMPRESSED"
+        echo "📦 Decompressione del backup..."
+        
+        # Trova il nome del file SQL all'interno dell'archivio
+        SQL_IN_ARCHIVE=$(tar -tzf "$BACKUP_PATH_COMPRESSED" | grep ".sql$" | head -n 1)
+        if [ -z "$SQL_IN_ARCHIVE" ]; then
+            echo "❌ Nessun file .sql trovato nell'archivio"
+            exit 1
+        fi
+        
+        # Decomprimi il file .tgz
+        tar -xzf "$BACKUP_PATH_COMPRESSED" -C "$BACKUP_DIR"
+        
+        # Rinomina il file estratto in ms_last.sql
+        mv -f "$BACKUP_DIR/$SQL_IN_ARCHIVE" "$BACKUP_PATH"
+        
+        if [ -f "$BACKUP_PATH" ]; then
+            echo "✅ Backup decompresso e rinominato: $BACKUP_FILE"
+        else
+            echo "❌ Errore nella decompressione o rinomina del backup"
+            exit 1
+        fi
+    elif [ -f "$BACKUP_PATH" ]; then
+        echo "✅ Utilizzo backup locale già decompresso: $BACKUP_FILE"
+    else
+        echo "❌ File di backup non trovato nella directory $BACKUP_DIR"
+        echo "   Assicurati che il file ms_last.sql.tgz o ms_last.sql sia presente"
         exit 1
     fi
-    
-    echo "✅ Utilizzo backup locale: $BACKUP_FILE"
 }
 
 # Logica principale
