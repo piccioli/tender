@@ -52,6 +52,25 @@ Esegue comandi Artisan Laravel
 ./scripts/artisan.sh list
 ```
 
+**Comandi personalizzati disponibili:**
+
+#### 🧹 `ms:cleanup_roles_and_permissions`
+Pulisce ruoli e permessi: rimuove tutti i permessi, elimina i ruoli manager e user, rimappa manager a tender_editor
+```bash
+# Modalità dry-run (mostra cosa farebbe senza eseguire)
+./scripts/artisan.sh ms:cleanup_roles_and_permissions --dry-run
+
+# Esecuzione con conferma
+./scripts/artisan.sh ms:cleanup_roles_and_permissions
+
+# Esecuzione forzata senza conferma
+./scripts/artisan.sh ms:cleanup_roles_and_permissions --force
+```
+
+**Opzioni:**
+- `--dry-run`: Mostra cosa verrebbe fatto senza eseguire le modifiche
+- `--force`: Esegue la pulizia senza richiedere conferma
+
 ### 📦 composer.sh
 Esegue comandi Composer
 ```bash
