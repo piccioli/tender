@@ -116,6 +116,44 @@ build_new_version() {
     echo "${major}.${minor}.${patch}"
 }
 
+# Funzione per aggiornare APP_VERSION nel file .env.local
+update_env_version() {
+    local new_version=$1
+    local release_date=$(date +'%Y-%m-%d')
+    local env_file=".env.local"
+    
+    log "📝 Aggiornando APP_VERSION in $env_file..."
+    
+    # Verifica se il file .env.local esiste
+    if [ ! -f "$env_file" ]; then
+        warn "⚠️  File $env_file non trovato, creando nuovo file..."
+        touch "$env_file"
+    fi
+    
+    # Crea la nuova stringa APP_VERSION con versione e data
+    local new_app_version="APP_VERSION=$new_version ($release_date)"
+    
+    # Verifica se APP_VERSION esiste già nel file
+    if grep -q "^APP_VERSION=" "$env_file"; then
+        # Aggiorna la variabile esistente
+        if [[ "$OSTYPE" == "darwin"* ]]; then
+            # macOS
+            sed -i '' "s/^APP_VERSION=.*/$new_app_version/" "$env_file"
+        else
+            # Linux
+            sed -i "s/^APP_VERSION=.*/$new_app_version/" "$env_file"
+        fi
+        log "✅ APP_VERSION aggiornata: $new_app_version"
+    else
+        # Aggiungi la nuova variabile alla fine del file
+        echo "" >> "$env_file"
+        echo "$new_app_version" >> "$env_file"
+        log "✅ APP_VERSION aggiunta: $new_app_version"
+    fi
+    
+    info "📋 APP_VERSION aggiornata in $env_file"
+}
+
 # Funzione per creare la release
 create_release() {
     local new_version=$1
@@ -151,21 +189,34 @@ create_release() {
     log "📥 Aggiornando repository..."
     git pull origin main
     
-    # Step 4: Creare il tag
+    # Step 4: Aggiornare APP_VERSION nel file .env.local
+    update_env_version "$new_version"
+    
+    # Step 5: Committare le modifiche al .env.local
+    if git diff --quiet .env.local; then
+        log "📝 Nessuna modifica al .env.local da committare"
+    else
+        log "📝 Committando modifiche al .env.local..."
+        git add .env.local
+        git commit -m "Update APP_VERSION to $new_version"
+    fi
+    
+    # Step 6: Creare il tag
     log "🏷️  Creando tag v$new_version..."
     git tag -a "v$new_version" -m "Release $new_version ($release_type)"
     
-    # Step 5: Push del tag
+    # Step 7: Push del tag
     log "📤 Push del tag..."
     git push origin "v$new_version"
     
-    # Step 6: Push delle modifiche
+    # Step 8: Push delle modifiche
     log "📤 Push delle modifiche..."
     git push origin main
     
     log "✅ Release $new_version creata con successo!"
     info "🏷️  Tag: v$new_version"
     info "📋 Tipo: $release_type"
+    info "📝 APP_VERSION aggiornata in .env.local"
 }
 
 # Controllo se siamo nella directory corretta
@@ -254,5 +305,6 @@ echo "   ✅ Versione precedente: $LAST_VERSION"
 echo "   ✅ Nuova versione: $NEW_VERSION"
 echo "   ✅ Tag creato: v$NEW_VERSION"
 echo "   ✅ Push completato"
+echo "   ✅ APP_VERSION aggiornata in .env.local"
 
 info "🔗 Per visualizzare la release: git show v$NEW_VERSION" 
