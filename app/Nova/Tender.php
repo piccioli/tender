@@ -39,7 +39,7 @@ class Tender extends Resource
      * @var array
      */
     public static $search = [
-        'id', 'name', 'manager', 'program', 'funding_agency'
+        'id', 'name', 'program', 'funding_agency'
     ];
 
     /**
