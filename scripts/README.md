@@ -4,6 +4,22 @@ Questa directory contiene script utili per gestire l'ambiente Docker del progett
 
 ## Script disponibili:
 
+### 🔧 setup_env.sh
+Configura l'ambiente locale creando il link simbolico tra `.env.local` e `.env`:
+```bash
+./scripts/setup_env.sh
+```
+
+**Gestione file .env:**
+- `.env.local`: Configurazione locale (versionato)
+- `.env`: Link simbolico a `.env.local` (non versionato)
+- `.env.prod`: Override per produzione (versionato)
+- `.env.backup.*`: Backup automatici (non versionati)
+
+**Workflow:**
+1. In locale: `.env` → link simbolico → `.env.local`
+2. In produzione: deploy.sh copia `.env.local` → `.env` e applica override da `.env.prod`
+
 ### 🚀 start.sh
 Avvia tutti i servizi Docker (app, database, apache)
 ```bash
@@ -106,6 +122,11 @@ Script per la gestione delle release con versioning semantico:
 
 ### deploy.sh
 Script completo per il deploy in produzione che automatizza:
+- **Gestione file .env per produzione:**
+  - Backup del file `.env` esistente
+  - Copia `.env.local` → `.env`
+  - Applica override da `.env.prod`
+- Backup del database
 - Ferma i container Docker
 - Esegue git pull per aggiornare il codice
 - Riavvia i container Docker

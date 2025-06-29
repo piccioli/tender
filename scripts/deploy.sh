@@ -79,7 +79,72 @@ else
     warn "⚠️  Script di backup non trovato (scripts/backup_db.sh), continuando senza backup..."
 fi
 
-# Step 2: Fermare i container Docker
+# Step 2: Gestione file .env per produzione
+log "🔧 Gestione file .env per produzione..."
+
+# Controllo se esiste il file .env
+if [ -f ".env" ]; then
+    # Creo backup del file .env attuale
+    BACKUP_DATE=$(date +'%Y%m%d_%H%M%S')
+    BACKUP_FILE=".env.backup.${BACKUP_DATE}"
+    cp .env "$BACKUP_FILE"
+    log "✅ Backup del file .env creato: $BACKUP_FILE"
+    
+    # Elimino il file .env attuale
+    rm .env
+    log "✅ File .env eliminato"
+else
+    warn "⚠️  File .env non trovato, continuando..."
+fi
+
+# Controllo se esiste il file .env.local
+if [ -f ".env.local" ]; then
+    # Copio .env.local in .env
+    cp .env.local .env
+    log "✅ File .env.local copiato in .env"
+else
+    error "❌ File .env.local non trovato! Impossibile procedere con il deploy."
+fi
+
+# Controllo se esiste il file .env.prod
+if [ -f ".env.prod" ]; then
+    # Sostituisco i valori delle variabili presenti in .env.prod
+    log "🔄 Applicando override di produzione..."
+    
+    # Leggo ogni riga del file .env.prod e aggiorno .env
+    while IFS= read -r line || [ -n "$line" ]; do
+        # Salto commenti e righe vuote
+        if [[ $line =~ ^[[:space:]]*# ]] || [[ -z "${line// }" ]]; then
+            continue
+        fi
+        
+        # Estraggo nome e valore della variabile
+        if [[ $line =~ ^([^=]+)=(.*)$ ]]; then
+            var_name="${BASH_REMATCH[1]}"
+            var_value="${BASH_REMATCH[2]}"
+            
+            # Sostituisco la variabile nel file .env
+            if grep -q "^${var_name}=" .env; then
+                # La variabile esiste, la sostituisco
+                sed -i.bak "s/^${var_name}=.*/${var_name}=${var_value}/" .env
+                log "   ✅ Aggiornata: $var_name"
+            else
+                # La variabile non esiste, la aggiungo
+                echo "${var_name}=${var_value}" >> .env
+                log "   ✅ Aggiunta: $var_name"
+            fi
+        fi
+    done < .env.prod
+    
+    # Rimuovo il file di backup temporaneo di sed
+    rm -f .env.bak
+    
+    log "✅ Override di produzione applicati con successo"
+else
+    warn "⚠️  File .env.prod non trovato, utilizzando configurazione locale"
+fi
+
+# Step 3: Fermare i container Docker
 log "📦 Fermando i container Docker..."
 docker-compose down
 if [ $? -eq 0 ]; then
@@ -88,7 +153,7 @@ else
     warn "⚠️  Alcuni container potrebbero essere già fermi"
 fi
 
-# Step 3: Pull del codice più recente
+# Step 4: Pull del codice più recente
 log "📥 Eseguendo git pull..."
 git pull origin main
 if [ $? -eq 0 ]; then
@@ -97,7 +162,7 @@ else
     error "❌ Errore durante il pull del codice"
 fi
 
-# Step 4: Avviare i container Docker
+# Step 5: Avviare i container Docker
 log "🚀 Avviando i container Docker..."
 docker-compose up -d
 if [ $? -eq 0 ]; then
@@ -106,11 +171,11 @@ else
     error "❌ Errore durante l'avvio dei container"
 fi
 
-# Step 5: Attendere che i container siano pronti
+# Step 6: Attendere che i container siano pronti
 log "⏳ Attendendo che i container siano pronti..."
 sleep 10
 
-# Step 6: Composer update
+# Step 7: Composer update
 log "📦 Eseguendo composer update..."
 docker-compose exec -T app composer update --no-dev --optimize-autoloader
 if [ $? -eq 0 ]; then
@@ -119,7 +184,7 @@ else
     error "❌ Errore durante composer update"
 fi
 
-# Step 7: Eseguire le migrazioni
+# Step 8: Eseguire le migrazioni
 log "🔄 Eseguendo le migrazioni del database..."
 docker-compose exec -T app php artisan migrate --force
 if [ $? -eq 0 ]; then
@@ -128,7 +193,7 @@ else
     error "❌ Errore durante l'esecuzione delle migrazioni"
 fi
 
-# Step 8: Pulire tutte le cache
+# Step 9: Pulire tutte le cache
 log "🧹 Pulendo tutte le cache..."
 docker-compose exec -T app php artisan optimize:clear
 if [ $? -eq 0 ]; then
@@ -137,7 +202,7 @@ else
     warn "⚠️  Errore durante la pulizia delle cache, ma continuando..."
 fi
 
-# Step 9: Ottimizzare per la produzione
+# Step 10: Ottimizzare per la produzione
 log "⚡ Ottimizzando per la produzione..."
 docker-compose exec -T app php artisan config:cache
 docker-compose exec -T app php artisan route:cache
@@ -148,7 +213,7 @@ else
     warn "⚠️  Alcune ottimizzazioni potrebbero essere fallite"
 fi
 
-# Step 10: Controllo finale dello stato
+# Step 11: Controllo finale dello stato
 log "🔍 Controllo finale dello stato..."
 docker-compose ps
 if [ $? -eq 0 ]; then
@@ -157,7 +222,7 @@ else
     warn "⚠️  Alcuni container potrebbero non essere in esecuzione"
 fi
 
-# Step 11: Test di connessione
+# Step 12: Test di connessione
 log "🌐 Testando la connessione all'applicazione..."
 sleep 5
 if curl -f http://localhost:8000 > /dev/null 2>&1; then
@@ -169,6 +234,7 @@ fi
 log "🎉 Deploy completato con successo!"
 log "📊 Riepilogo delle operazioni:"
 echo "   ✅ Backup del database eseguito"
+echo "   ✅ File .env gestiti per produzione"
 echo "   ✅ Container Docker fermati e riavviati"
 echo "   ✅ Codice aggiornato da git"
 echo "   ✅ Composer update eseguito"

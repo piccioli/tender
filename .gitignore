@@ -6,6 +6,10 @@ composer.phar
 # Backup database
 /db_backups/
 
+# Environment files
+.env
+.env.backup.*
+
 # macOS system files
 .DS_Store
 **/.DS_Store
