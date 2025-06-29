@@ -118,27 +118,70 @@ Script per la gestione delle release con versioning semantico:
 - Richiede conferma prima di procedere con la release
 - Verifica che non ci siano modifiche non committate
 
-## 🚀 Script di Deploy per Produzione:
+## 🚀 Script di Deploy per Produzione e Locale:
 
 ### deploy.sh
-Script completo per il deploy in produzione che automatizza:
-- **Gestione file .env per produzione:**
+Script completo per il deploy in produzione o locale che automatizza il processo di deployment:
+
+**Uso:**
+```bash
+./scripts/deploy.sh <ambiente>
+```
+
+**Parametri:**
+- `prod` - Deploy in produzione
+- `local` - Deploy in locale
+
+**Esempi:**
+```bash
+# Deploy in produzione
+./scripts/deploy.sh prod
+
+# Deploy in locale
+./scripts/deploy.sh local
+```
+
+**Differenze tra ambienti:**
+
+#### 🏭 **PRODUZIONE** (`prod`):
+- **File .env**: 
   - Backup del file `.env` esistente
   - Copia `.env.local` → `.env`
   - Applica override da `.env.prod`
-- Backup del database
+- **Database**: 
+  - Backup automatico del database
+  - Esegue seeder ruoli/permessi
+  - Lancia le migrazioni
+- **Ottimizzazioni**: 
+  - Cache di configurazione, route e view
+  - Ottimizzazioni per performance
+
+#### 🏠 **LOCALE** (`local`):
+- **File .env**: 
+  - Se non esiste, crea link simbolico `.env` → `.env.local`
+- **Database**: 
+  - Esegue restore del database con `--download`
+  - Esegue seeder ruoli/permessi
+  - Lancia le migrazioni
+- **Ottimizzazioni**: 
+  - Solo pulizia cache (no ottimizzazioni)
+
+**Operazioni comuni:**
+- Backup del database (solo produzione)
+- Gestione file .env specifica per ambiente
 - Ferma i container Docker
 - Esegue git pull per aggiornare il codice
 - Riavvia i container Docker
 - Esegue composer update
-- Lancia le migrazioni del database
-- Pulisce tutte le cache
-- Ottimizza per la produzione
+- Gestione database specifica per ambiente
+- Pulisce le cache
+- Ottimizza per la produzione (solo produzione)
 - Testa la connessione all'applicazione
 
-```bash
-./scripts/deploy.sh
-```
+**Sicurezza:**
+- Richiede conferma per il deploy in produzione
+- Backup automatico prima delle operazioni critiche
+- Controlli di validazione dei parametri
 
 ### rollback.sh
 Script per il rollback in caso di problemi:
