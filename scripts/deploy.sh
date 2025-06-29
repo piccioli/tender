@@ -45,9 +45,41 @@ if ! command -v docker-compose &> /dev/null; then
     error "docker-compose non è installato o non è nel PATH"
 fi
 
+# Richiesta di conferma per il deploy
+echo -e "${YELLOW}⚠️  ATTENZIONE: Stai per eseguire un deploy in produzione! ⚠️${NC}"
+echo ""
+echo -e "${RED}Questa operazione:${NC}"
+echo "   • Fermerà temporaneamente l'applicazione"
+echo "   • Aggiornerà il codice sorgente"
+echo "   • Eseguirà le migrazioni del database"
+echo "   • Potrebbe causare downtime"
+echo ""
+echo -e "${YELLOW}Prima di procedere, verrà eseguito un backup automatico del database.${NC}"
+echo ""
+
+read -p "Sei sicuro di voler procedere con il deploy? (y/N): " -n 1 -r
+echo ""
+if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+    echo -e "${BLUE}Deploy annullato dall'utente.${NC}"
+    exit 0
+fi
+
 log "🚀 Iniziando deploy in produzione..."
 
-# Step 1: Fermare i container Docker
+# Step 1: Backup del database
+log "💾 Eseguendo backup del database..."
+if [ -f "scripts/backup_db.sh" ]; then
+    bash scripts/backup_db.sh
+    if [ $? -eq 0 ]; then
+        log "✅ Backup del database completato con successo"
+    else
+        warn "⚠️  Errore durante il backup del database, ma continuando..."
+    fi
+else
+    warn "⚠️  Script di backup non trovato (scripts/backup_db.sh), continuando senza backup..."
+fi
+
+# Step 2: Fermare i container Docker
 log "📦 Fermando i container Docker..."
 docker-compose down
 if [ $? -eq 0 ]; then
@@ -56,7 +88,7 @@ else
     warn "⚠️  Alcuni container potrebbero essere già fermi"
 fi
 
-# Step 2: Pull del codice più recente
+# Step 3: Pull del codice più recente
 log "📥 Eseguendo git pull..."
 git pull origin main
 if [ $? -eq 0 ]; then
@@ -65,7 +97,7 @@ else
     error "❌ Errore durante il pull del codice"
 fi
 
-# Step 3: Avviare i container Docker
+# Step 4: Avviare i container Docker
 log "🚀 Avviando i container Docker..."
 docker-compose up -d
 if [ $? -eq 0 ]; then
@@ -74,11 +106,11 @@ else
     error "❌ Errore durante l'avvio dei container"
 fi
 
-# Step 4: Attendere che i container siano pronti
+# Step 5: Attendere che i container siano pronti
 log "⏳ Attendendo che i container siano pronti..."
 sleep 10
 
-# Step 5: Composer update
+# Step 6: Composer update
 log "📦 Eseguendo composer update..."
 docker-compose exec -T app composer update --no-dev --optimize-autoloader
 if [ $? -eq 0 ]; then
@@ -87,7 +119,7 @@ else
     error "❌ Errore durante composer update"
 fi
 
-# Step 6: Eseguire le migrazioni
+# Step 7: Eseguire le migrazioni
 log "🔄 Eseguendo le migrazioni del database..."
 docker-compose exec -T app php artisan migrate --force
 if [ $? -eq 0 ]; then
@@ -96,7 +128,7 @@ else
     error "❌ Errore durante l'esecuzione delle migrazioni"
 fi
 
-# Step 7: Pulire tutte le cache
+# Step 8: Pulire tutte le cache
 log "🧹 Pulendo tutte le cache..."
 docker-compose exec -T app php artisan optimize:clear
 if [ $? -eq 0 ]; then
@@ -105,7 +137,7 @@ else
     warn "⚠️  Errore durante la pulizia delle cache, ma continuando..."
 fi
 
-# Step 8: Ottimizzare per la produzione
+# Step 9: Ottimizzare per la produzione
 log "⚡ Ottimizzando per la produzione..."
 docker-compose exec -T app php artisan config:cache
 docker-compose exec -T app php artisan route:cache
@@ -116,7 +148,7 @@ else
     warn "⚠️  Alcune ottimizzazioni potrebbero essere fallite"
 fi
 
-# Step 9: Controllo finale dello stato
+# Step 10: Controllo finale dello stato
 log "🔍 Controllo finale dello stato..."
 docker-compose ps
 if [ $? -eq 0 ]; then
@@ -125,7 +157,7 @@ else
     warn "⚠️  Alcuni container potrebbero non essere in esecuzione"
 fi
 
-# Step 10: Test di connessione
+# Step 11: Test di connessione
 log "🌐 Testando la connessione all'applicazione..."
 sleep 5
 if curl -f http://localhost:8000 > /dev/null 2>&1; then
@@ -136,6 +168,7 @@ fi
 
 log "🎉 Deploy completato con successo!"
 log "📊 Riepilogo delle operazioni:"
+echo "   ✅ Backup del database eseguito"
 echo "   ✅ Container Docker fermati e riavviati"
 echo "   ✅ Codice aggiornato da git"
 echo "   ✅ Composer update eseguito"
