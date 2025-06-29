@@ -25,6 +25,38 @@ e questo progetto aderisce al [Semantic Versioning](https://semver.org/spec/v2.0
 ### Security
 - Vulnerabilità di sicurezza risolte
 
+## [1.1.0] - 2025-06-28
+
+### Added
+- **Script di backup database migliorato** con compressione automatica e link simbolico
+- **Script di restore database** con download automatico dalla produzione
+- **Sistema di conferma utente** per operazioni di deploy in produzione
+- **Backup automatico del database** prima di ogni deploy
+- **Gestione file compressi** (.tgz) per backup e restore
+- **Sistema di help integrato** negli script di utilità
+- **Configurazione personalizzabile** tramite variabili d'ambiente per restore
+- **Pulizia automatica** dei file di backup obsoleti
+
+### Changed
+- **Script deploy.sh migliorato** con backup automatico e conferma utente
+- **Script restore_db.sh ottimizzato** con download automatico e gestione errori migliorata
+- **Script backup_db.sh potenziato** con compressione e link simbolico
+- **Gestione errori migliorata** in tutti gli script di utilità
+- **Sicurezza rafforzata** per operazioni di deploy in produzione
+
+### Fixed
+- **Gestione file compressi** risolta per backup e restore
+- **Controllo esistenza script** aggiunto per prevenire errori
+- **Selezione manuale file** eliminata in favore di selezione automatica
+- **Gestione errori** migliorata per operazioni critiche
+
+### Technical
+- **Compressione automatica** dei backup database con tar
+- **Link simbolico** per accesso rapido all'ultimo backup
+- **Download automatico** da produzione per restore
+- **Conferma utente** con avvertimenti sui rischi per deploy
+- **Pulizia automatica** dei file di backup obsoleti
+
 ## [1.0.1] - 2025-06-29
 
 ### Added

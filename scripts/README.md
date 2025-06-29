@@ -68,6 +68,40 @@ Mostra questa guida rapida con tutti gli script disponibili
 ./scripts/help.sh
 ```
 
+## 🏷️ Script di Release:
+
+### release.sh
+Script per la gestione delle release con versioning semantico:
+- Crea tag git per le nuove versioni
+- Supporta major, minor e hotfix
+- Gestisce automaticamente l'incremento delle versioni
+- Richiede conferma prima di procedere
+
+```bash
+# Release major (es: 1.0.0 -> 2.0.0)
+./scripts/release.sh major
+
+# Release minor (es: 1.0.0 -> 1.1.0)
+./scripts/release.sh minor
+
+# Release hotfix (es: 1.0.0 -> 1.0.1)
+./scripts/release.sh hotfix 1.0.0
+
+# Mostra help
+./scripts/release.sh help
+```
+
+**Tipi di release:**
+- **major**: Incrementa la versione major (cambiamenti incompatibili)
+- **minor**: Incrementa la versione minor (nuove funzionalità compatibili)
+- **hotfix**: Incrementa la versione patch (correzioni di bug)
+
+**Note:**
+- Per hotfix è obbligatorio specificare la release base
+- Lo script recupera automaticamente l'ultima versione da git
+- Richiede conferma prima di procedere con la release
+- Verifica che non ci siano modifiche non committate
+
 ## 🚀 Script di Deploy per Produzione:
 
 ### deploy.sh
