@@ -25,6 +25,43 @@ e questo progetto aderisce al [Semantic Versioning](https://semver.org/spec/v2.0
 ### Security
 - Vulnerabilità di sicurezza risolte
 
+## [1.2.0] - 2025-06-29
+
+### Added
+- **Sistema avanzato di gestione file .env** con separazione locale/produzione
+- **Script di release automatizzato** con versioning semantico (major/minor/hotfix)
+- **Gestione automatica APP_VERSION** con aggiornamento automatico durante le release
+- **Sistema di backup automatico** del database prima di ogni deploy
+- **Conferma utente per deploy** in produzione con avvertimenti sui rischi
+- **Script setup_env.sh** per configurazione automatica ambiente locale
+- **File .env.prod** per override configurazioni di produzione
+- **Documentazione completa** per gestione ambienti e deployment
+- **Sistema di link simbolici** per gestione file .env in sviluppo
+- **Backup automatici** dei file .env in produzione con timestamp
+
+### Changed
+- **Script deploy.sh potenziato** con backup automatico e conferma utente
+- **Gestione file .env migliorata** con separazione locale/produzione
+- **Script release.sh completamente riscritto** con versioning semantico
+- **Workflow di sviluppo ottimizzato** con setup automatico ambiente
+- **Sicurezza rafforzata** per operazioni di deploy in produzione
+- **Documentazione script aggiornata** con nuove funzionalità
+
+### Fixed
+- **Gestione file compressi** risolta per backup e restore
+- **Controllo esistenza script** aggiunto per prevenire errori
+- **Gestione errori migliorata** per operazioni critiche
+- **Compatibilità cross-platform** per script (macOS/Linux)
+
+### Technical
+- **Versioning semantico automatizzato** con script release.sh
+- **Gestione APP_VERSION dinamica** con aggiornamento automatico
+- **Sistema di backup incrementale** per file di configurazione
+- **Link simbolici** per gestione file .env in sviluppo
+- **Override configurazioni** per ambiente di produzione
+- **Conferma utente** con avvertimenti sui rischi per deploy
+- **Backup automatico** del database prima di ogni deploy
+
 ## [1.1.0] - 2025-06-28
 
 ### Added
