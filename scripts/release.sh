@@ -131,7 +131,7 @@ update_env_version() {
     fi
     
     # Crea la nuova stringa APP_VERSION con versione e data
-    local new_app_version="APP_VERSION=$new_version ($release_date)"
+    local new_app_version="APP_VERSION='$new_version ($release_date)'"
     
     # Verifica se APP_VERSION esiste già nel file
     if grep -q "^APP_VERSION=" "$env_file"; then
