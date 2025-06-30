@@ -131,7 +131,11 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
     {
         Gate::define('viewNova', function (User $user) {
             // Allow only users with admin role to access Nova
-            return $user->hasRole('admin');
+            // return $user->hasRole('admin');
+            // return $user->hasAnyRole(['admin', '...', ]);
+            
+            // allow every user to access Nova
+            return true;
         });
     }
 
