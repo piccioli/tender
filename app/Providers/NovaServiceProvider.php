@@ -11,6 +11,7 @@ use Laravel\Nova\Menu\MenuSection;
 use Laravel\Nova\Nova;
 use Laravel\Nova\NovaApplicationServiceProvider;
 use Tender\WelcomePage\WelcomePage;
+use Tender\MontFlow\MontFlow;
 use Illuminate\Support\Facades\Blade;
 
 
@@ -47,6 +48,7 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
             $menu = [
                 MenuSection::make('Home', [
                     MenuItem::externalLink('Welcome','/nova/welcome-page'),
+                    MenuItem::externalLink('MontFlow','/nova/mont-flow'),
                     MenuItem::dashboard(\App\Nova\Dashboards\Main::class)->name('Nova'),
                 ])->icon('home')->collapsable(),
                 
@@ -154,6 +156,7 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
     {
         return [
             new WelcomePage,
+                        new MontFlow(),
         ];
     }
 

@@ -14,7 +14,8 @@
         "laravel/tinker": "^2.10.1",
         "spatie/laravel-permission": "^6.20",
         "laravel/nova": "^5.0",
-        "tender/welcome-page": "@dev"
+        "tender/welcome-page": "@dev",
+        "tender/mont-flow": "@dev"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
@@ -86,6 +87,10 @@
         {
             "type": "path",
             "url": "./nova-components/WelcomePage"
+        },
+        {
+            "type": "path",
+            "url": "./nova-components/MontFlow"
         }
     ]
 }

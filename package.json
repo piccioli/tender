@@ -6,7 +6,9 @@
         "build": "vite build",
         "dev": "vite",
         "build-welcome-page": "cd nova-components/WelcomePage && npm run dev",
-        "build-welcome-page-prod": "cd nova-components/WelcomePage && npm run prod"
+        "build-welcome-page-prod": "cd nova-components/WelcomePage && npm run prod",
+        "build-mont-flow": "cd nova-components/MontFlow && npm run dev",
+        "build-mont-flow-prod": "cd nova-components/MontFlow && npm run prod"
     },
     "devDependencies": {
         "@tailwindcss/vite": "^4.0.0",
