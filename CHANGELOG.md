@@ -5,6 +5,33 @@ Tutte le modifiche notevoli a questo progetto saranno documentate in questo file
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e questo progetto aderisce al [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2024-06-29
+
+### Added
+- **Nuovo componente Nova MontFlow**: pagina personalizzata con descrizione dettagliata dei ruoli e permessi, stile coerente con la welcome page.
+- **Script create_nova_page.sh** per la creazione automatica di nuove pagine Nova.
+- **Seeder ruoli avanzato**: aggiunti 7 ruoli definiti per la gestione permessi.
+- **Comando Artisan per cleanup ruoli e permessi**.
+- **Migrazione per cleanup ruoli e permessi**.
+- **Parametro ambiente per lo script di deploy**.
+
+### Changed
+- Sostituito il ruolo 'manager' con 'tender_manager' nelle policy dei tender.
+- Spostata la logica di cleanup da una migration a un comando Artisan.
+- Aggiornato provider e package per integrare il nuovo componente MontFlow.
+- Rimozione dei ruoli e permessi dal menu admin di Nova.
+- Aggiornata la configurazione di .env.local.
+
+### Removed
+- Rimosso il componente HelpMontFlow.
+- Rimossa la directory .npm dal versionamento.
+
+### Fixed
+- Aggiunte le virgolette singole ad APP_VERSION in .env.local per evitare errori di parsing.
+
+### Technical
+- Script di pulizia repository (`git clean`).
+
 ## [Unreleased]
 
 ### Added

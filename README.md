@@ -1,6 +1,6 @@
 # 🏔️ Gestionale Montagna Servizi SCPA
 
-[![Release](https://img.shields.io/badge/release-v1.0.0-blue.svg)](https://github.com/piccioli/tender/releases/tag/v1.0.0)
+[![Release](https://img.shields.io/badge/release-v1.3.0-blue.svg)](https://github.com/piccioli/tender/releases/tag/v1.3.0)
 [![Laravel](https://img.shields.io/badge/Laravel-10.x-red.svg)](https://laravel.com)
 [![Nova](https://img.shields.io/badge/Nova-4.x-purple.svg)](https://nova.laravel.com)
 [![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://docker.com)
@@ -15,6 +15,7 @@ Sistema di gestione tender completo per **Montagna Servizi SCPA**, sviluppato co
 - **📤 Esportazione dati** con azioni personalizzate
 - **🔄 Script di deployment** e rollback per produzione
 - **📱 Interfaccia responsive** ottimizzata per tutti i dispositivi
+- **🎯 Componenti Nova custom** per funzionalità specifiche
 
 ## 🛠️ Tecnologie Utilizzate
 
@@ -110,6 +111,9 @@ Il progetto include script per semplificare le operazioni:
 # Pulizia e ottimizzazione
 ./scripts/clear.sh    # Pulisce cache
 ./scripts/logs.sh     # Visualizza log
+
+# Gestione Nova
+./scripts/create_nova_page.sh  # Crea nuova pagina Nova
 ```
 
 ## 🏗️ Struttura del Progetto
@@ -125,10 +129,28 @@ tender/
 │   ├── migrations/     # Migrazioni database
 │   └── seeders/        # Seeder per dati iniziali
 ├── nova-components/    # Componenti Nova custom
+│   ├── WelcomePage/    # Pagina di benvenuto personalizzata
+│   └── MontFlow/       # Gestione flussi di lavoro e ruoli
 ├── scripts/           # Script di utilità
 ├── docker/            # Configurazioni Docker
 └── resources/         # Assets frontend
 ```
+
+## 🎯 Componenti Nova Custom
+
+### WelcomePage
+Pagina di benvenuto personalizzata con:
+- Logo e branding Montagna Servizi
+- Dashboard con funzionalità principali
+- Azioni rapide per navigazione
+- Informazioni di sistema
+
+### MontFlow
+Sistema di gestione flussi di lavoro con:
+- **Descrizione dettagliata ruoli** e permessi
+- **7 ruoli definiti**: Admin, Tender Manager, Tender Editor, Tender PM, Team Member, Team Manager, Customer Operator
+- **Interfaccia coerente** con il design del sistema
+- **Navigazione rapida** tra sezioni
 
 ## 🔐 Sicurezza
 
@@ -220,5 +242,5 @@ Questo progetto è sviluppato per **Montagna Servizi SCPA** e non è open source
 
 ---
 
-**Versione:** v1.0.0  
+**Versione:** v1.3.0  
 **Ultimo aggiornamento:** 29 Giugno 2025
