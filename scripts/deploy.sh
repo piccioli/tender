@@ -233,21 +233,21 @@ fi
 log "🗄️  Gestione Database per ambiente: $ENVIRONMENT"
 
 if [ "$ENVIRONMENT" = "prod" ]; then
-    # PRODUZIONE: Seeder ruoli/permessi e poi migrazioni
-    log "🌱 Eseguendo seeder ruoli e permessi..."
-    docker-compose exec -T app php artisan db:seed --class=RolePermissionSeeder
-    if [ $? -eq 0 ]; then
-        log "✅ Seeder ruoli e permessi completato con successo"
-    else
-        warn "⚠️  Errore durante il seeder, ma continuando..."
-    fi
-    
+    # PRODUZIONE: Prima migrazioni, poi seeder ruoli/permessi
     log "🔄 Eseguendo le migrazioni del database..."
     docker-compose exec -T app php artisan migrate --force
     if [ $? -eq 0 ]; then
         log "✅ Migrazioni completate con successo"
     else
         error "❌ Errore durante l'esecuzione delle migrazioni"
+    fi
+    
+    log "🌱 Eseguendo seeder ruoli e permessi..."
+    docker-compose exec -T app php artisan db:seed --class=RolePermissionSeeder --force
+    if [ $? -eq 0 ]; then
+        log "✅ Seeder ruoli e permessi completato con successo"
+    else
+        warn "⚠️  Errore durante il seeder, ma continuando..."
     fi
 else
     # LOCALE: Restore database, seeder ruoli e migrazioni
@@ -329,8 +329,8 @@ if [ "$ENVIRONMENT" = "prod" ]; then
     echo "   ✅ Container Docker fermati e riavviati"
     echo "   ✅ Codice aggiornato da git"
     echo "   ✅ Composer update eseguito"
-    echo "   ✅ Seeder ruoli e permessi completato"
     echo "   ✅ Migrazioni database completate"
+    echo "   ✅ Seeder ruoli e permessi completato"
     echo "   ✅ Cache pulite e ottimizzate"
     echo "   ✅ Applicazione testata"
 else
