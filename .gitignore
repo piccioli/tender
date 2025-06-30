@@ -13,3 +13,7 @@ composer.phar
 # macOS system files
 .DS_Store
 **/.DS_Store
+
+# Node.js files
+.npm
+.npmrc
